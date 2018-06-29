@@ -1,5 +1,3 @@
-{ Saw.ar(100) }.play;
-
 (
 SynthDef.new(\simple_subtractive, {
 	arg note, cutoff_freq, res;
@@ -9,7 +7,7 @@ SynthDef.new(\simple_subtractive, {
 	);
 	osc1 = RLPF.ar(Saw.ar(note.midicps)!2, cutoff_freq * filter_env, res);
 	amp_env = EnvGen.kr(
-		Env.new([0, 1, 0.8, 0], [0.01, 0.4, 0.5]),
+		Env.new([0, 1, 0.8, 0.8, 0], [0.01, 0.2, 0.1, 0.2]),
 		doneAction: 2
 	);
 	signal = osc1 * amp_env;
