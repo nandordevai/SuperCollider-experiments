@@ -1,6 +1,9 @@
+MIDIClient.init;
+MIDIIn.connectAll;
+
 (
-SynthDef.new(\simple_subtractive, {
-	arg note, cutoff_freq, res;
+SynthDef.new(\mono, {
+	arg note, cutoff_freq = 4000, res = 0.1;
 	var osc1, amp_env, signal, filter_env;
 	filter_env = EnvGen.kr(
 		Env.new([1, 0], [0.5])
@@ -15,13 +18,41 @@ SynthDef.new(\simple_subtractive, {
 }).add;
 )
 
-s = Synth(\simple_subtractive, [\note, 32, \cutoff_freq, 4000, \res, 0.1]);
+s = Synth(\mono, [\note, 32, \cutoff_freq, 4000, \res, 0.1]);
 
 (
 Pbind(
-    \instrument, \simple_subtractive,
+    \instrument, \mono,
     \note, Pseq([32, 32, 44, 44, 39, 39, 35, 35], inf),
 	\cutoff_freq, 4000,
 	\res, 0.1
 ).play;
+)
+
+~notes = Array.newClear(128);
+
+(
+MIDIdef.noteOn(\noteOn, {
+	arg velocity, note;
+	~notes[note] = Synth(
+		\mono, [
+			\note, note,
+			\cutoff_freq, ~cutoff
+		]);
+});
+)
+
+~cutoff = 9000;
+
+(
+MIDIdef.cc(\modwheel, {
+	arg val;
+	~notes.do {
+		arg synth;
+		var freq;
+		freq = val.linlin(0, 127, 400, 18000);
+		~cutoff = freq;
+		synth.set(\cutoff_freq, freq);
+	};
+});
 )
