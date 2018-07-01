@@ -18,14 +18,15 @@ SynthDef.new(\mono, {
 }).add;
 )
 
-s = Synth(\mono, [\note, 32, \cutoff_freq, 4000, \res, 0.1]);
+~mono = Synth(\mono, [\note, 32, \cutoff_freq, 4000, \res, 0.1]);
 
-(
+~mono_p = (
 Pbind(
     \instrument, \mono,
+	\dur, Pseq([0.75, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], inf),
     \note, Pseq([32, 32, 44, 44, 39, 39, 35, 35], inf),
-	\cutoff_freq, 4000,
-	\res, 0.1
+	\cutoff_freq, 500,
+	\res, 0.2
 ).play;
 )
 
