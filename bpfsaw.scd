@@ -24,8 +24,8 @@ SynthDef(\bpfsaw, {
 (
 10.do {
 	Synth(\bpfsaw, [
-		\amp, 0.2,
-		\freq, (Scale.minor.degrees + 60).midicps.choose,
+		\amp, 0.4,
+		\freq, (Scale.minor.degrees + 40).midicps.choose,
 		\center_freq, exprand(200, 400),
 		\reciprocal_q, exprand(0.01, 0.2),
 		// \detune, 2,
