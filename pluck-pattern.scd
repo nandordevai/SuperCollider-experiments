@@ -12,7 +12,6 @@
 };
 )
 
-thisProcess.removeOSCRecvFunc(~onOSCReceive);
 thisProcess.addOSCRecvFunc(~onOSCReceive);
 
 (
@@ -37,7 +36,7 @@ SynthDef(\pluck, {
 )
 
 (
-Pbind(*[
+p = Pbind(*[
 	instrument: 'pluck',
 	scale: Scale.harmonicMinor,
 	degree: Pseq((0..7).scramble, inf),
@@ -48,6 +47,4 @@ Pbind(*[
 ]).play(TempoClock(80 / 60));
 )
 
-// NetAddr.langPort
-// OSCFunc.trace(true);
-// OSCFunc.trace(false);
+p.stop
