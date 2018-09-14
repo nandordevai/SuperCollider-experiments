@@ -1,3 +1,8 @@
+// s.options.memSize(65536);
+s.options.outDevice = "Soundflower (2ch)";
+ServerOptions.devices;
+s.boot();
+
 MIDIClient.init;
 MIDIIn.connectAll;
 
@@ -20,7 +25,7 @@ SynthDef(\pluck, {
 		coef: mutedString);
 	Out.ar(0, [snd, snd]);
 }).add;
-)
+);
 
 ~notes = Array.newClear(128);
 
@@ -33,4 +38,6 @@ MIDIdef.noteOn(\noteOn, {
 			\mutedString, velocity.linlin(0, 127, 0.8, 0.1)
 		]);
 });
-)
+);
+
+s.quit();
