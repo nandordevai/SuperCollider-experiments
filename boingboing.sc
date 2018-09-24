@@ -3,7 +3,7 @@ Ndef(\verb, {
 	var input, output, delrd, sig, deltimes;
 
 	delrd = LocalIn.ar(4);
-	output = input + delrd[[0,1]];
+	output = input ++ delrd[[0,1]];
 	sig = output ++ delrd[[2,3]];
 	sig = ([ [1, 1, 1, 1],
 	 [1, -1, 1, -1],

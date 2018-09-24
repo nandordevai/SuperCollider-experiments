@@ -3,32 +3,31 @@ MIDIIn.connectAll;
 
 (
 SynthDef.new(\mono, {
-	arg note, cutoff_freq = 4000, res = 0.1;
-	var osc1, amp_env, signal, filter_env;
+	arg
+	note,
+	cutoff_freq = 4000,
+	res = 0.1,
+	gate = 1;
+
+	var
+	osc1,
+	filter_out,
+	amp_env,
+	signal,
+	filter_env,
+	gen;
+
 	filter_env = EnvGen.kr(
-		Env.new([1, 0], [0.5])
+		Env.new([1, 0.01], [0.5], 'exp')
 	);
-	osc1 = RLPF.ar(Saw.ar(note.midicps)!2, cutoff_freq * filter_env, res);
-	amp_env = EnvGen.kr(
-		Env.new([0, 1, 0.8, 0.8, 0], [0.01, 0.2, 0.1, 0.2]),
-		doneAction: 2
-	);
-	signal = osc1 * amp_env;
+	amp_env = Env.adsr(0.01, 0.2, 0.8, 0.2);
+	gen = EnvGen.kr(amp_env, gate, doneAction: 2);
+	osc1 = Saw.ar(note.midicps)!2;
+	filter_out = RLPF.ar(osc1, cutoff_freq * filter_env, res);
+	signal = filter_out * gen;
 	Out.ar(0, signal);
 }).add;
-)
-
-~mono = Synth(\mono, [\note, 32, \cutoff_freq, 4000, \res, 0.1]);
-
-~mono_p = (
-Pbind(
-    \instrument, \mono,
-	\dur, Pseq([0.75, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], inf),
-    \note, Pseq([32, 32, 44, 44, 39, 39, 35, 35], inf),
-	\cutoff_freq, 500,
-	\res, 0.2
-).play;
-)
+);
 
 ~notes = Array.newClear(128);
 
@@ -38,12 +37,17 @@ MIDIdef.noteOn(\noteOn, {
 	~notes[note] = Synth(
 		\mono, [
 			\note, note,
-			\cutoff_freq, ~cutoff
-		]);
+			\cutoff_freq, velocity.linexp(0, 127, 200, 15000)
+	]);
 });
-)
+);
 
-~cutoff = 9000;
+(
+MIDIdef.noteOff(\noteOff, {
+	arg velocity, note;
+	~notes[note].set(*[gate: 0]);
+});
+);
 
 (
 MIDIdef.cc(\modwheel, {
@@ -52,8 +56,7 @@ MIDIdef.cc(\modwheel, {
 		arg synth;
 		var freq;
 		freq = val.linlin(0, 127, 400, 18000);
-		~cutoff = freq;
 		synth.set(\cutoff_freq, freq);
 	};
 });
-)
+);
